@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Filtro de Empresas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans p-8">
+
+    <h1 class="text-3xl font-semibold text-center mb-8 text-gray-700">Consulta por UF, Município e CNAE</h1>
+
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <div class="mb-4">
+            <label for="uf" class="block text-gray-600 font-medium">UF:</label>
+            <input type="text" id="uf" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: SC" maxlength="2" />
+        </div>
+
+        <div class="mb-4">
+            <label for="municipio" class="block text-gray-600 font-medium">Município (Código):</label>
+            <input type="text" id="municipio" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: 8297" />
+        </div>
+
+        <div class="mb-6">
+            <label for="cnae" class="block text-gray-600 font-medium">CNAE:</label>
+            <input type="text" id="cnae" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: 1412602" />
+        </div>
+
+        <div class="text-center">
+            <button onclick="consultar()" class="px-6 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                Buscar
+            </button>
+        </div>
+    </div>
+    <!-- Loading Spinner -->
+<div id="loading" class="flex justify-center mt-6 hidden">
+    <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
+</div>
+
+<!-- Tabela Resultado -->
+    <div class="mt-8 max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <table id="resultado" class="w-full table-auto border-collapse">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">CNPJ Básico</th>
+                    <th class="px-4 py-2 bg-gray-100 text-center text-sm font-semibold text-gray-600 border-b">Ordem</th>
+                    <th class="px-4 py-2 bg-gray-100 text-center text-sm font-semibold text-gray-600 border-b">DV</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm text-gray-600">
+
+               
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
