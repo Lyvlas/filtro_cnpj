@@ -22,56 +22,42 @@ colecao_cnpjs = db["filtro_cnpj"]
 colecao_municipios = db["municipio"]
 colecao_cnaes = db["cnaes"]
 
-# Endpoint de filtro atualizado
+def formatar_cnpj(basico, ordem, dv):
+    cnpj = f"{basico}{ordem}{dv}"
+    return f"{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/{cnpj[8:12]} - {cnpj[12:14]}"
+
 @app.get("/filtro")
 def filtrar(
     uf: str = Query(...),
     municipio: str = Query(...),
     cnae: str = Query(...),
 ):
-    # Ajusta o código do município para ser sempre uma string de 4 dígitos
-    municipio = str(municipio).zfill(4)  # Adiciona zeros à esquerda se necessário
-    
-    print(f"UF: {uf}, Código Município: {municipio}, CNAE: {cnae}")  # Log para verificar os parâmetros de entrada
-    
-    # Construção da query de CNPJs
+    municipio = str(municipio).zfill(4)
+    print(f"UF: {uf}, Código Município: {municipio}, CNAE: {cnae}")
+
     query = {
         "uf": uf.upper(),
         "codigo_municipio": municipio,
         "cnae_fiscal_principal": cnae
     }
 
-    # Consulta aos CNPJs
-    resultados_cnpjs = list(colecao_cnpjs.find(
+    cursor = colecao_cnpjs.find(
         query,
         {"_id": 0, "cnpj_basico": 1, "cnpj_ordem": 1, "cnpj_dv": 1}
-    ).limit(100))
+    ).limit(100)
 
-    # Log para verificar os resultados dos CNPJs
-    print(f"Resultados CNPJs: {resultados_cnpjs}")
+    resultados_cnpjs = []
+    for doc in cursor:
+        cnpj_formatado = formatar_cnpj(doc['cnpj_basico'], doc['cnpj_ordem'], doc['cnpj_dv'])
+        resultados_cnpjs.append({
+            "cnpj_completo": cnpj_formatado
+        })
 
-    # Busca a descrição do município
-    print(f"Consultando município com código: {municipio}")  # Log de município
     municipio_doc = colecao_municipios.find_one({"codigo_municipio": municipio}, {"_id": 0, "municipio_descricao": 1})
-    
-    # Verifica se a descrição do município foi encontrada
-    if municipio_doc:
-        print(f"Descrição do Município Encontrada: {municipio_doc['municipio_descricao']}")
-        descricao_municipio = municipio_doc["municipio_descricao"]
-    else:
-        print(f"Descrição do Município NÃO encontrada para o código: {municipio}")
-        descricao_municipio = "Município não encontrado"
-    
-    # Busca a descrição do CNAE
+    descricao_municipio = municipio_doc["municipio_descricao"] if municipio_doc else "Município não encontrado"
+
     cnae_doc = colecao_cnaes.find_one({"codigo_cnae": cnae}, {"_id": 0, "cnae_descricao": 1})
-    
-    # Verifica se a descrição do CNAE foi encontrada
-    if cnae_doc:
-        print(f"Descrição do CNAE Encontrada: {cnae_doc['cnae_descricao']}")
-        descricao_cnae = cnae_doc["cnae_descricao"]
-    else:
-        print("Descrição do CNAE NÃO encontrada.")
-        descricao_cnae = "CNAE não encontrado"
+    descricao_cnae = cnae_doc["cnae_descricao"] if cnae_doc else "CNAE não encontrado"
 
     return {
         "municipio_descricao": descricao_municipio,
@@ -79,7 +65,6 @@ def filtrar(
         "resultados": resultados_cnpjs
     }
 
-# Servir página HTML
 @app.get("/")
 def home():
     caminho = os.path.join("template", "index.html")
@@ -87,5 +72,4 @@ def home():
         return {"erro": "index.html não encontrado!"}
     return FileResponse(caminho)
 
-# Servir arquivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
