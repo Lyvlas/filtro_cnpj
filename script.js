@@ -21,7 +21,6 @@ async function consultar() {
 
         const data = await res.json();
 
-
         if (data.resultados.length === 0) {
             tbody.innerHTML = `
                 <tr>
@@ -29,17 +28,17 @@ async function consultar() {
                 </tr>
             `;
         } else {
-            data.resultados.forEach(({ cnpj_completo }) => {
+            data.resultados.forEach(({ cnpj_completo, nome_empresa }) => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td class="px-4 py-2 text-left border-b" colspan="3">${cnpj_completo}</td>
+                    <td class="px-4 py-2 text-left border-b">${cnpj_completo}</td>
+                    <td class="px-4 py-2 text-left border-b">${nome_empresa}</td>
                     <td class="px-4 py-2 text-left border-b">${data.municipio_descricao}</td>
                     <td class="px-4 py-2 text-left border-b">${data.cnae_descricao}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
-
     } catch (err) {
         alert("Erro ao consultar API: " + err.message);
         console.error(err);
