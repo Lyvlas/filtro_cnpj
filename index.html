@@ -12,21 +12,21 @@
     <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
         <div class="mb-4">
             <label for="uf" class="block text-gray-600 font-medium">UF:</label>
-            <input type="text" id="uf" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: SC" maxlength="2" />
+            <input type="text" id="uf" class="w-full px-4 py-2 border border-gray-300 rounded-md" placeholder="Ex: SC" maxlength="2" />
         </div>
 
         <div class="mb-4">
             <label for="municipio" class="block text-gray-600 font-medium">Município (Código):</label>
-            <input type="text" id="municipio" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: 8297" maxlength="4"/>
+            <input type="text" id="municipio" class="w-full px-4 py-2 border border-gray-300 rounded-md" placeholder="Ex: 8297" maxlength="4"/>
         </div>
 
         <div class="mb-6">
             <label for="cnae" class="block text-gray-600 font-medium">CNAE:</label>
-            <input type="text" id="cnae" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: 1412602" />
+            <input type="text" id="cnae" class="w-full px-4 py-2 border border-gray-300 rounded-md" placeholder="Ex: 1412602" />
         </div>
 
         <div class="text-center">
-            <button onclick="consultar()" class="px-6 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button onclick="consultar()" class="px-6 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600">
                 Buscar
             </button>
         </div>
@@ -36,12 +36,12 @@
         <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
     </div>
 
-    <div class="mt-8 max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
-
+    <div class="mt-8 mx-auto bg-white p-4 rounded-lg shadow-md" style="max-width: 56rem;">
         <table id="resultado" class="w-full table-auto border-collapse">
             <thead>
                 <tr>
-                    <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b" colspan="3">CNPJ</th>
+                    <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">CNPJ</th>
+                    <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">Empresa</th>
                     <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">Município</th>
                     <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">CNAE</th>
                 </tr>
