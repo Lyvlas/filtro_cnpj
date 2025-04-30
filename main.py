@@ -3,11 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pymongo import MongoClient
-import os
 
 app = FastAPI()
 
-# Libera acesso frontend
+# Libera o CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,61 +14,72 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# MongoDB
+# Conexão com MongoDB
 client = MongoClient("mongodb://localhost:27017/")
 db = client["local"]
 colecao_cnpjs = db["filtro_cnpj"]
 colecao_municipios = db["municipio"]
 colecao_cnaes = db["cnaes"]
+colecao_empresas = db["empresa"]
+
+# Indexação para performance
+colecao_cnpjs.create_index([("uf", 1), ("codigo_municipio", 1), ("cnae_fiscal_principal", 1)])
+colecao_empresas.create_index("cnpj_basico")
 
 def formatar_cnpj(basico, ordem, dv):
     cnpj = f"{basico}{ordem}{dv}"
-    return f"{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/{cnpj[8:12]} - {cnpj[12:14]}"
+    return f"{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/{cnpj[8:12]}-{cnpj[12:14]}"
 
 @app.get("/filtro")
-def filtrar(
-    uf: str = Query(...),
-    municipio: str = Query(...),
-    cnae: str = Query(...),
-):
-    municipio = str(municipio).zfill(4)
-    print(f"UF: {uf}, Código Município: {municipio}, CNAE: {cnae}")
+def filtrar(uf: str, municipio: str, cnae: str):
+    municipio = municipio.zfill(4)
 
-    query = {
-        "uf": uf.upper(),
-        "codigo_municipio": municipio,
-        "cnae_fiscal_principal": cnae
-    }
+    pipeline = [
+        {"$match": {
+            "uf": uf.upper(),
+            "codigo_municipio": municipio,
+            "cnae_fiscal_principal": cnae
+        }},
+        {"$limit": 100},
+        {"$lookup": {
+            "from": "empresa",
+            "localField": "cnpj_basico",
+            "foreignField": "cnpj_basico",
+            "as": "empresa_info"
+        }},
+        {"$unwind": {
+            "path": "$empresa_info",
+            "preserveNullAndEmptyArrays": True
+        }},
+        {"$project": {
+            "_id": 0,
+            "cnpj_basico": 1,
+            "cnpj_ordem": 1,
+            "cnpj_dv": 1,
+            "razao_social": "$empresa_info.razao_social"
+        }}
+    ]
 
-    cursor = colecao_cnpjs.find(
-        query,
-        {"_id": 0, "cnpj_basico": 1, "cnpj_ordem": 1, "cnpj_dv": 1}
-    ).limit(100)
+    resultados = list(colecao_cnpjs.aggregate(pipeline))
+    dados = []
 
-    resultados_cnpjs = []
-    for doc in cursor:
-        cnpj_formatado = formatar_cnpj(doc['cnpj_basico'], doc['cnpj_ordem'], doc['cnpj_dv'])
-        resultados_cnpjs.append({
-            "cnpj_completo": cnpj_formatado
-        })
+    for r in resultados:
+        cnpj = formatar_cnpj(r["cnpj_basico"], r["cnpj_ordem"], r["cnpj_dv"])
+        nome = r.get("razao_social", "Desconhecida")
+        dados.append({"cnpj_completo": cnpj, "nome_empresa": nome})
 
-    municipio_doc = colecao_municipios.find_one({"codigo_municipio": municipio}, {"_id": 0, "municipio_descricao": 1})
-    descricao_municipio = municipio_doc["municipio_descricao"] if municipio_doc else "Município não encontrado"
-
+    mun = colecao_municipios.find_one({"codigo_municipio": municipio}, {"_id": 0, "municipio_descricao": 1})
     cnae_doc = colecao_cnaes.find_one({"codigo_cnae": cnae}, {"_id": 0, "cnae_descricao": 1})
-    descricao_cnae = cnae_doc["cnae_descricao"] if cnae_doc else "CNAE não encontrado"
 
     return {
-        "municipio_descricao": descricao_municipio,
-        "cnae_descricao": descricao_cnae,
-        "resultados": resultados_cnpjs
+        "municipio_descricao": mun["municipio_descricao"] if mun else "Não encontrado",
+        "cnae_descricao": cnae_doc["cnae_descricao"] if cnae_doc else "Não encontrado",
+        "resultados": dados
     }
 
 @app.get("/")
-def home():
-    caminho = os.path.join("template", "index.html")
-    if not os.path.exists(caminho):
-        return {"erro": "index.html não encontrado!"}
-    return FileResponse(caminho)
+def raiz():
+    return FileResponse("template/index.html")
 
+# Arquivos estáticos (JS, CSS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
