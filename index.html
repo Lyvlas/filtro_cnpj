@@ -32,25 +32,22 @@
         </div>
     </div>
 
-    <!-- Loading Spinner -->
     <div id="loading" class="flex justify-center mt-6 hidden">
         <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
     </div>
 
-    <!-- Tabela Resultado -->
     <div class="mt-8 max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+
         <table id="resultado" class="w-full table-auto border-collapse">
             <thead>
                 <tr>
-                    <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">CNPJ Básico</th>
-                    <th class="px-4 py-2 bg-gray-100 text-center text-sm font-semibold text-gray-600 border-b">Ordem</th>
-                    <th class="px-4 py-2 bg-gray-100 text-center text-sm font-semibold text-gray-600 border-b">DV</th>
+                    <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b" colspan="3">CNPJ</th>
                     <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">Município</th>
                     <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">CNAE</th>
                 </tr>
             </thead>
             <tbody id="resultado-body" class="text-sm text-gray-600">
-                <!-- As linhas serão adicionadas pelo JavaScript -->
+                <!-- Linhas injetadas por JS -->
             </tbody>
         </table>
     </div>
