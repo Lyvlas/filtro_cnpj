@@ -32,7 +32,7 @@
         </div>
 
         <div class="text-center">
-            <button onclick="consultar()" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+            <button onclick="paginaAtual = 1; consultar()" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
                 Buscar
             </button>
         </div>
@@ -60,6 +60,30 @@
                 </tr>
             </tbody>
         </table>
+
+         <!-- Paginador -->
+        <div id="paginacao-container" class="flex justify-center gap-4 mt-4 hidden">
+            <!-- Botão Anterior -->
+            <button id="anterior"
+                onclick="mudarPagina(-1)"
+                class="w-10 h-10 bg-gray-300 rounded-full hover:bg-gray-400 disabled:opacity-30 flex items-center justify-center transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+
+            <span id="paginacao" class="text-gray-600 self-center text-sm">Página 1 de 1</span>
+
+            <!-- Botão Próximo -->
+            <button id="proximo"
+                onclick="mudarPagina(1)"
+                class="w-10 h-10 bg-gray-300 rounded-full hover:bg-gray-400 disabled:opacity-30 flex items-center justify-center transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+
+        </div>    
     </div>
 
     <script src="/static/script.js"></script>
