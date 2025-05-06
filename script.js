@@ -11,11 +11,12 @@ async function carregarUFs() {
         console.log("Carregando UFs...");
         const res = await fetch(`${BASE_URL}/ufs`);
         if (!res.ok) throw new Error("Falha ao carregar UFs.");
-        
+
         const ufs = await res.json();
-        console.log("UFs carregadas:", ufs);  // Verificar o que foi retornado
+        console.log("UFs carregadas:", ufs);
         const select = document.getElementById("uf");
-        select.innerHTML = `<option value="">Selecione a UF</option>` + ufs.map(uf => `<option value="${uf}">${uf}</option>`).join('');
+        select.innerHTML = `<option value="">Selecione a UF</option>` +
+            ufs.map(uf => `<option value="${uf}">${uf}</option>`).join('');
     } catch (error) {
         console.error("Erro ao carregar UFs:", error);
     }
@@ -29,12 +30,12 @@ async function carregarMunicipios() {
         console.log("Carregando municípios para UF:", uf);
         const res = await fetch(`${BASE_URL}/municipios?uf=${uf}`);
         if (!res.ok) throw new Error("Falha ao carregar municípios.");
-        
+
         const municipios = await res.json();
-        console.log("Municípios carregados:", municipios);  // Verificar o que foi retornado
+        console.log("Municípios carregados:", municipios);
         const select = document.getElementById("municipio");
         select.innerHTML = `<option value="">Selecione o município</option>` +
-            municipios.map(m => 
+            municipios.map(m =>
                 `<option value="${m.codigo_municipio}">${m.codigo_municipio} - ${m.municipio_descricao}</option>`
             ).join('');
     } catch (error) {
@@ -47,9 +48,9 @@ async function carregarCNAEs() {
         console.log("Carregando CNAEs...");
         const res = await fetch(`${BASE_URL}/cnaes`);
         if (!res.ok) throw new Error("Falha ao carregar CNAEs.");
-        
+
         const cnaes = await res.json();
-        console.log("CNAEs carregados:", cnaes);  // Verificar o que foi retornado
+        console.log("CNAEs carregados:", cnaes);
         const select = document.getElementById("cnae");
         select.innerHTML = `<option value="">Selecione o CNAE</option>` +
             cnaes.map(c => `<option value="${c.codigo_cnae}">${c.codigo_cnae} - ${c.cnae_descricao}</option>`).join('');
@@ -80,24 +81,36 @@ async function consultar() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const data = await res.json();
+        console.log("Resposta da API:", data);
 
-        if (data.resultados.length === 0) {
+        if (!data.resultados || data.resultados.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="4" class="px-4 py-2 text-center text-gray-500">Nenhum resultado encontrado</td>
+                    <td colspan="3" class="px-4 py-2 text-center text-gray-500">Nenhum resultado encontrado</td>
                 </tr>
             `;
         } else {
-            data.resultados.forEach(({ cnpj_completo, nome_empresa }) => {
+            const municipioDescricao = data.municipio_descricao || '—';
+
+            data.resultados.forEach(resultado => {
+                const cnpj = resultado.cnpj_completo || '—';
+                let nome = resultado.nome_empresa || '—';
+
+                
+                const pos = nome.indexOf(' ', 50);
+                if (pos !== -1) {
+                    nome = nome.slice(0, pos) + '<br>' + nome.slice(pos + 1);
+        }   
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td class="px-4 py-2 text-left border-b">${cnpj_completo}</td>
-                    <td class="px-4 py-2 text-left border-b">${nome_empresa}</td>
-                    <td class="px-4 py-2 text-left border-b">${data.municipio_descricao}</td>
-                    <td class="px-4 py-2 text-left border-b">${data.cnae_descricao}</td>
+                    <td class="px-4 py-2 text-left border-b whitespace-nowrap font-mono tracking-tight">${cnpj}</td>
+                    <td class="px-4 py-2 text-left border-b break-words max-w-[32rem]">${nome}</td>
+                    <td class="px-4 py-2 text-left border-b">${municipioDescricao}</td>
                 `;
                 tbody.appendChild(tr);
             });
+            
+            
         }
     } catch (err) {
         alert("Erro ao consultar API: " + err.message);
