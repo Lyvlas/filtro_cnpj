@@ -5,15 +5,15 @@ window.onload = () => {
 };
 
 const BASE_URL = window.location.origin;
+let paginaAtual = 1;
+let ultimaPagina = 1;
 
 async function carregarUFs() {
     try {
-        console.log("Carregando UFs...");
         const res = await fetch(`${BASE_URL}/ufs`);
         if (!res.ok) throw new Error("Falha ao carregar UFs.");
 
         const ufs = await res.json();
-        console.log("UFs carregadas:", ufs);
         const select = document.getElementById("uf");
         select.innerHTML = `<option value="">Selecione a UF</option>` +
             ufs.map(uf => `<option value="${uf}">${uf}</option>`).join('');
@@ -27,12 +27,10 @@ async function carregarMunicipios() {
     if (!uf) return;
 
     try {
-        console.log("Carregando municípios para UF:", uf);
         const res = await fetch(`${BASE_URL}/municipios?uf=${uf}`);
         if (!res.ok) throw new Error("Falha ao carregar municípios.");
 
         const municipios = await res.json();
-        console.log("Municípios carregados:", municipios);
         const select = document.getElementById("municipio");
         select.innerHTML = `<option value="">Selecione o município</option>` +
             municipios.map(m =>
@@ -45,12 +43,10 @@ async function carregarMunicipios() {
 
 async function carregarCNAEs() {
     try {
-        console.log("Carregando CNAEs...");
         const res = await fetch(`${BASE_URL}/cnaes`);
         if (!res.ok) throw new Error("Falha ao carregar CNAEs.");
 
         const cnaes = await res.json();
-        console.log("CNAEs carregados:", cnaes);
         const select = document.getElementById("cnae");
         select.innerHTML = `<option value="">Selecione o CNAE</option>` +
             cnaes.map(c => `<option value="${c.codigo_cnae}">${c.codigo_cnae} - ${c.cnae_descricao}</option>`).join('');
@@ -59,19 +55,27 @@ async function carregarCNAEs() {
     }
 }
 
+function mudarPagina(direcao) {
+    const novaPagina = paginaAtual + direcao;
+    if (novaPagina < 1 || novaPagina > ultimaPagina) return;
+    paginaAtual = novaPagina;
+    consultar();
+}
+
 async function consultar() {
     const uf = document.getElementById("uf").value.trim().toUpperCase();
     const municipio = document.getElementById("municipio").value.trim().padStart(4, '0');
     const cnae = document.getElementById("cnae").value.trim();
     const loading = document.getElementById("loading");
     const tbody = document.getElementById("resultado-body");
+    const paginacaoContainer = document.getElementById("paginacao-container");
 
     if (!uf || !municipio || !cnae) {
         alert("Preencha todos os campos.");
         return;
     }
 
-    const url = `${BASE_URL}/filtro?uf=${uf}&municipio=${municipio}&cnae=${cnae}`;
+    const url = `${BASE_URL}/filtro?uf=${uf}&municipio=${municipio}&cnae=${cnae}&page=${paginaAtual}`;
 
     loading.classList.remove("hidden");
     tbody.innerHTML = "";
@@ -81,7 +85,8 @@ async function consultar() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const data = await res.json();
-        console.log("Resposta da API:", data);
+        ultimaPagina = data.ultima_pagina || 1;
+        document.getElementById("paginacao").textContent = `Página ${paginaAtual} de ${ultimaPagina}`;
 
         if (!data.resultados || data.resultados.length === 0) {
             tbody.innerHTML = `
@@ -89,18 +94,18 @@ async function consultar() {
                     <td colspan="3" class="px-4 py-2 text-center text-gray-500">Nenhum resultado encontrado</td>
                 </tr>
             `;
+            paginacaoContainer.classList.add("hidden");  // atualizado
         } else {
             const municipioDescricao = data.municipio_descricao || '—';
-
+        
             data.resultados.forEach(resultado => {
                 const cnpj = resultado.cnpj_completo || '—';
                 let nome = resultado.nome_empresa || '—';
-
-                
+        
                 const pos = nome.indexOf(' ', 50);
                 if (pos !== -1) {
                     nome = nome.slice(0, pos) + '<br>' + nome.slice(pos + 1);
-        }   
+                }
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td class="px-4 py-2 text-left border-b whitespace-nowrap font-mono tracking-tight">${cnpj}</td>
@@ -109,9 +114,13 @@ async function consultar() {
                 `;
                 tbody.appendChild(tr);
             });
-            
-            
+        
+            paginacaoContainer.classList.remove("hidden");  // atualizado
         }
+        
+        document.getElementById("anterior").disabled = paginaAtual === 1;
+        document.getElementById("proximo").disabled = paginaAtual === ultimaPagina;
+
     } catch (err) {
         alert("Erro ao consultar API: " + err.message);
         console.error(err);
