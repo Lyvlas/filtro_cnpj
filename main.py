@@ -34,8 +34,9 @@ def formatar_cnpj(basico, ordem, dv):
 
 # Endpoint principal de filtro
 @app.get("/filtro")
-def filtrar(uf: str, municipio: str, cnae: str):
+def filtrar(uf: str, municipio: str, cnae: str, page: int = Query(1, ge=1)):
     municipio = municipio.zfill(4)
+    skip = (page - 1) * 100
 
     pipeline = [
         {"$match": {
@@ -43,6 +44,8 @@ def filtrar(uf: str, municipio: str, cnae: str):
             "codigo_municipio": municipio,
             "cnae_fiscal_principal": cnae
         }},
+        {"$sort": {"cnpj_basico": 1}},  # Para paginação consistente
+        {"$skip": skip},
         {"$limit": 100},
         {"$lookup": {
             "from": "empresa",
@@ -64,25 +67,33 @@ def filtrar(uf: str, municipio: str, cnae: str):
     ]
 
     resultados = list(colecao_cnpjs.aggregate(pipeline))
-    dados = []
 
+    # Para controle de última página
+    total = colecao_cnpjs.count_documents({
+        "uf": uf.upper(),
+        "codigo_municipio": municipio,
+        "cnae_fiscal_principal": cnae
+    })
+
+    dados = []
     for r in resultados:
         cnpj = formatar_cnpj(r["cnpj_basico"], r["cnpj_ordem"], r["cnpj_dv"])
         nome = r.get("razao_social", "Desconhecida")
-
         dados.append({
             "cnpj_completo": cnpj,
             "nome_empresa": nome
         })
 
-    # Nome do município para exibir na tabela
     municipio_info = colecao_municipios.find_one({"codigo_municipio": municipio})
     nome_municipio = municipio_info["municipio_descricao"] if municipio_info else "Desconhecido"
 
     return {
         "resultados": dados,
-        "municipio_descricao": nome_municipio
+        "municipio_descricao": nome_municipio,
+        "pagina": page,
+        "ultima_pagina": (total + 99) // 100
     }
+
 
 # Lista de UFs disponíveis
 @app.get("/ufs")
