@@ -8,6 +8,7 @@ const BASE_URL = window.location.origin;
 let paginaAtual = 1;
 let ultimaPagina = 1;
 
+//** Carrega as UFs disponíveis na API e as adiciona ao select */
 async function carregarUFs() {
     try {
         const res = await fetch(`${BASE_URL}/ufs`);
@@ -21,7 +22,7 @@ async function carregarUFs() {
         console.error("Erro ao carregar UFs:", error);
     }
 }
-
+//** Carrega os municípios disponíveis na API e os adiciona ao select */
 async function carregarMunicipios() {
     const uf = document.getElementById("uf").value;
     if (!uf) return;
@@ -40,7 +41,7 @@ async function carregarMunicipios() {
         console.error("Erro ao carregar municípios:", error);
     }
 }
-
+//** Carrega os CNAEs disponíveis na API e os adiciona ao select */
 async function carregarCNAEs() {
     try {
         const res = await fetch(`${BASE_URL}/cnaes`);
@@ -91,12 +92,11 @@ async function consultar() {
         if (!data.resultados || data.resultados.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="3" class="px-4 py-2 text-center text-gray-500">Nenhum resultado encontrado</td>
+                    <td colspan="2" class="px-4 py-2 text-center text-gray-500">Nenhum resultado encontrado</td>
                 </tr>
             `;
             paginacaoContainer.classList.add("hidden");  // atualizado
         } else {
-            const municipioDescricao = data.municipio_descricao || '—';
         
             data.resultados.forEach(resultado => {
                 const cnpj = resultado.cnpj_completo || '—';
@@ -109,8 +109,7 @@ async function consultar() {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td class="px-4 py-2 text-left border-b whitespace-nowrap font-mono tracking-tight">${cnpj}</td>
-                    <td class="px-4 py-2 text-left border-b break-words max-w-[32rem]">${nome}</td>
-                    <td class="px-4 py-2 text-left border-b">${municipioDescricao}</td>
+                    <td class="px-4 py-2 text-left border-b break-words">${nome}</td>
                 `;
                 tbody.appendChild(tr);
             });
