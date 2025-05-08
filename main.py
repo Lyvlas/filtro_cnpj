@@ -31,7 +31,6 @@ def formatar_cnpj(basico, ordem, dv):
     cnpj = f"{basico.zfill(8)}{ordem.zfill(4)}{dv.zfill(2)}"
     return f"{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/{cnpj[8:12]}-{cnpj[12:14]}"
 
-
 # Endpoint principal de filtro
 @app.get("/filtro")
 def filtrar(uf: str, municipio: str, cnae: str, page: int = Query(1, ge=1)):
@@ -44,7 +43,7 @@ def filtrar(uf: str, municipio: str, cnae: str, page: int = Query(1, ge=1)):
             "codigo_municipio": municipio,
             "cnae_fiscal_principal": cnae
         }},
-        {"$sort": {"cnpj_basico": 1}},  # Para paginação consistente
+        {"$sort": {"cnpj_basico": 1}},
         {"$skip": skip},
         {"$limit": 100},
         {"$lookup": {
@@ -62,13 +61,13 @@ def filtrar(uf: str, municipio: str, cnae: str, page: int = Query(1, ge=1)):
             "cnpj_basico": 1,
             "cnpj_ordem": 1,
             "cnpj_dv": 1,
-            "razao_social": "$empresa_info.razao_social"
+            "razao_social": {"$ifNull": ["$empresa_info.razao_social", "Desconhecida"]},
+            "capital_social": {"$ifNull": ["$empresa_info.capital_social", 0]}
         }}
     ]
 
     resultados = list(colecao_cnpjs.aggregate(pipeline))
 
-    # Para controle de última página
     total = colecao_cnpjs.count_documents({
         "uf": uf.upper(),
         "codigo_municipio": municipio,
@@ -79,18 +78,28 @@ def filtrar(uf: str, municipio: str, cnae: str, page: int = Query(1, ge=1)):
     for r in resultados:
         cnpj = formatar_cnpj(r["cnpj_basico"], r["cnpj_ordem"], r["cnpj_dv"])
         nome = r.get("razao_social", "Desconhecida")
+        capital = r.get("capital_social", 0)
+
+        # Conversão segura de capital para float e formatação BRL
+        try:
+            if isinstance(capital, str):
+                capital = capital.replace("R$", "").replace(".", "").replace(",", ".").strip()
+            capital = float(capital)
+        except (ValueError, TypeError, AttributeError):
+            capital = 0.0
+
+        capital_formatado = f"R$ {capital:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
         dados.append({
             "cnpj_completo": cnpj,
-            "nome_empresa": nome
+            "nome_empresa": nome,
+            "capital_social": capital_formatado
         })
-
 
     return {
         "resultados": dados,
-        "pagina": page,
-        "ultima_pagina": (total + 99) // 100
+        "ultima_pagina": (total + 99) // 100  # Arredondamento para cima
     }
-
 
 # Lista de UFs disponíveis
 @app.get("/ufs")
