@@ -92,7 +92,7 @@ async function consultar() {
         if (!data.resultados || data.resultados.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="2" class="px-4 py-2 text-center text-gray-500">Nenhum resultado encontrado</td>
+                    <td colspan="3" class="px-4 py-2 text-center text-gray-500">Nenhum resultado encontrado</td>
                 </tr>
             `;
             paginacaoContainer.classList.add("hidden");  // atualizado
@@ -101,15 +101,18 @@ async function consultar() {
             data.resultados.forEach(resultado => {
                 const cnpj = resultado.cnpj_completo || '—';
                 let nome = resultado.nome_empresa || '—';
-        
+                const capital = resultado.capital_social || '—';
+            
                 const pos = nome.indexOf(' ', 50);
                 if (pos !== -1) {
                     nome = nome.slice(0, pos) + '<br>' + nome.slice(pos + 1);
                 }
+            
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td class="px-4 py-2 text-left border-b whitespace-nowrap font-mono tracking-tight">${cnpj}</td>
                     <td class="px-4 py-2 text-left border-b break-words">${nome}</td>
+                    <td class="px-4 py-2 text-left border-b whitespace-nowrap">${capital}</td>
                 `;
                 tbody.appendChild(tr);
             });
