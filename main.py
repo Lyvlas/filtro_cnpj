@@ -84,12 +84,9 @@ def filtrar(uf: str, municipio: str, cnae: str, page: int = Query(1, ge=1)):
             "nome_empresa": nome
         })
 
-    municipio_info = colecao_municipios.find_one({"codigo_municipio": municipio})
-    nome_municipio = municipio_info["municipio_descricao"] if municipio_info else "Desconhecido"
 
     return {
         "resultados": dados,
-        "municipio_descricao": nome_municipio,
         "pagina": page,
         "ultima_pagina": (total + 99) // 100
     }
