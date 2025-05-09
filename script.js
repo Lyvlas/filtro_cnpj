@@ -92,16 +92,20 @@ async function consultar() {
         if (!data.resultados || data.resultados.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="3" class="px-4 py-2 text-center text-gray-500">Nenhum resultado encontrado</td>
+                    <td colspan="7" class="px-4 py-2 text-center text-gray-500">Nenhum resultado encontrado</td>
                 </tr>
             `;
-            paginacaoContainer.classList.add("hidden");  // atualizado
+            paginacaoContainer.classList.add("hidden"); 
         } else {
         
             data.resultados.forEach(resultado => {
                 const cnpj = resultado.cnpj_completo || '—';
                 let nome = resultado.nome_empresa || '—';
                 const capital = resultado.capital_social || '—';
+                const tipo = resultado.tipo_unidade || '—'; 
+                const telefone = resultado.telefone || '—';
+                const email = resultado.email || '—';
+                
             
                 const pos = nome.indexOf(' ', 50);
                 if (pos !== -1) {
@@ -113,11 +117,16 @@ async function consultar() {
                     <td class="px-4 py-2 text-left border-b whitespace-nowrap font-mono tracking-tight">${cnpj}</td>
                     <td class="px-4 py-2 text-left border-b break-words">${nome}</td>
                     <td class="px-4 py-2 text-left border-b whitespace-nowrap">${capital}</td>
+                    <td class="px-4 py-2 text-left border-b whitespace-nowrap">${tipo}</td>
+                    <td class="px-4 py-2 border-b">${resultado.situacao_cadastral}</td>
+                    <td class="px-4 py-2 border-b whitespace-nowrap">${telefone}</td>
+                    <td class="px-4 py-2 border-b">${email}</td>
                 `;
                 tbody.appendChild(tr);
             });
+            
         
-            paginacaoContainer.classList.remove("hidden");  // atualizado
+            paginacaoContainer.classList.remove("hidden"); 
         }
         
         document.getElementById("anterior").disabled = paginaAtual === 1;
