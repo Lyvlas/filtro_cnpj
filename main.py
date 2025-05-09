@@ -61,9 +61,15 @@ def filtrar(uf: str, municipio: str, cnae: str, page: int = Query(1, ge=1)):
             "cnpj_basico": 1,
             "cnpj_ordem": 1,
             "cnpj_dv": 1,
+            "matriz_filial": 1,
+            "situacao_cadastral": 1,
+            "ddd1": {"$ifNull": ["$ddd1", ""]},
+            "telefone1": {"$ifNull": ["$telefone1", ""]},
+            "email": {"$ifNull": ["$email", "—"]}, 
             "razao_social": {"$ifNull": ["$empresa_info.razao_social", "Desconhecida"]},
             "capital_social": {"$ifNull": ["$empresa_info.capital_social", 0]}
         }}
+
     ]
 
     resultados = list(colecao_cnpjs.aggregate(pipeline))
@@ -90,10 +96,38 @@ def filtrar(uf: str, municipio: str, cnae: str, page: int = Query(1, ge=1)):
 
         capital_formatado = f"R$ {capital:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
+        tipo = "Matriz" if r.get("matriz_filial") == "1" else "Filial"
+
+        situacoes = {
+            "01": "NULA",
+            "1": "NULA",
+            "02": "ATIVA",
+            "2": "ATIVA",
+            "03": "SUSPENSA",
+            "3": "SUSPENSA",
+            "04": "INAPTA",
+            "4": "INAPTA",
+            "08": "BAIXADA",
+            "8": "BAIXADA",
+        }
+        situacao = situacoes.get(str(r.get("situacao_cadastral", "")).zfill(2), "Desconhecida")
+
+        telefone = ""
+        ddd = r.get("ddd1")
+        tel = r.get("telefone1")
+        if ddd and tel:
+             telefone = f"({ddd}) {tel}"
+
+        email = r.get("email", "—")
+
         dados.append({
             "cnpj_completo": cnpj,
             "nome_empresa": nome,
-            "capital_social": capital_formatado
+            "capital_social": capital_formatado,
+            "tipo_unidade": tipo,
+            "situacao_cadastral": situacao,
+            "telefone": telefone or "—",
+            "email": email or "—"
         })
 
     return {
