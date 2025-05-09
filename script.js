@@ -120,7 +120,8 @@ async function consultar() {
                     <td class="px-4 py-2 text-left border-b whitespace-nowrap">${tipo}</td>
                     <td class="px-4 py-2 border-b">${resultado.situacao_cadastral}</td>
                     <td class="px-4 py-2 border-b whitespace-nowrap">${telefone}</td>
-                    <td class="px-4 py-2 border-b">${email}</td>
+                    <td class="px-4 py-2 border-b ">${email}</td>
+
                 `;
                 tbody.appendChild(tr);
             });
