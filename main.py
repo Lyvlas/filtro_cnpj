@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pymongo import MongoClient
+from typing import Optional
 
 app = FastAPI()
 
@@ -33,16 +34,21 @@ def formatar_cnpj(basico, ordem, dv):
 
 # Endpoint principal de filtro
 @app.get("/filtro")
-def filtrar(uf: str, municipio: str, cnae: str, page: int = Query(1, ge=1)):
+def filtrar(uf: str, municipio: str, cnae: str,situacao: Optional[str] = None, page: int = Query(1, ge=1)):
     municipio = municipio.zfill(4)
     skip = (page - 1) * 100
 
+    match_query = {
+        "uf": uf.upper(),
+        "codigo_municipio": municipio,
+        "cnae_fiscal_principal": cnae
+    }
+
+    if situacao:
+        match_query["situacao_cadastral"] = situacao
+
     pipeline = [
-        {"$match": {
-            "uf": uf.upper(),
-            "codigo_municipio": municipio,
-            "cnae_fiscal_principal": cnae
-        }},
+        {"$match": match_query},
         {"$sort": {"cnpj_basico": 1}},
         {"$skip": skip},
         {"$limit": 100},
@@ -74,11 +80,7 @@ def filtrar(uf: str, municipio: str, cnae: str, page: int = Query(1, ge=1)):
 
     resultados = list(colecao_cnpjs.aggregate(pipeline))
 
-    total = colecao_cnpjs.count_documents({
-        "uf": uf.upper(),
-        "codigo_municipio": municipio,
-        "cnae_fiscal_principal": cnae
-    })
+    total = colecao_cnpjs.count_documents(match_query)
 
     dados = []
     for r in resultados:
