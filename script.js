@@ -67,6 +67,7 @@ async function consultar() {
     const uf = document.getElementById("uf").value.trim().toUpperCase();
     const municipio = document.getElementById("municipio").value.trim().padStart(4, '0');
     const cnae = document.getElementById("cnae").value.trim();
+    const situacao = document.getElementById("situacao").value;
     const loading = document.getElementById("loading");
     const tbody = document.getElementById("resultado-body");
     const paginacaoContainer = document.getElementById("paginacao-container");
@@ -76,7 +77,7 @@ async function consultar() {
         return;
     }
 
-    const url = `${BASE_URL}/filtro?uf=${uf}&municipio=${municipio}&cnae=${cnae}&page=${paginaAtual}`;
+    const url = `${BASE_URL}/filtro?uf=${uf}&municipio=${municipio}&cnae=${cnae}&situacao=${situacao}&page=${paginaAtual}`;
 
     loading.classList.remove("hidden");
     tbody.innerHTML = "";
