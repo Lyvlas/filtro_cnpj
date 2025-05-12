@@ -34,6 +34,18 @@
             </select>
         </div>
 
+        <div class="mb-4">
+            <label for="situacao" class="block text-gray-700 font-medium">Situação Cadastral:</label>
+            <select id="situacao" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Todas</option>
+                <option value="01">NULA</option>
+                <option value="02">ATIVA</option>
+                <option value="03">SUSPENSA</option>
+                <option value="04">INAPTA</option>
+                <option value="08">BAIXADA</option>
+            </select>
+        </div>
+
         <div class="text-center">
             <button onclick="paginaAtual = 1; consultar()" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
                 Buscar
