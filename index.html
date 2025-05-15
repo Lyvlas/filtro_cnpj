@@ -88,21 +88,21 @@
         <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
     </div>
 
-    <div class="mt-8 mx-auto bg-white p-6 rounded-lg shadow-lg" style="max-width: 70rem;">
-        <table id="resultado" class="w-full table-auto border-collapse">
-            <thead>
+    <div class="mt-8 mx-auto bg-white p-6 rounded-xl shadow-xl border border-gray-200 overflow-auto" style="max-width: 70rem;">
+       <table id="resultado" class="w-full table-auto border-collapse text-sm text-gray-700">
+            <thead class="bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 <tr>
-                    <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">CNPJ</th>
-                    <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">Empresa</th>
-                    <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">Capital Social</th>
-                    <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">Tipo Unidade</th>
-                    <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">Situação Cadastral</th>
-                    <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">Telefone</th>
-                    <th class="px-4 py-2 bg-gray-100 text-left text-sm font-semibold text-gray-600 border-b">E-mail</th>
-
+                    <th class="px-3 py-2 border-b">CNPJ</th>
+                    <th class="px-3 py-2 border-b">Empresa</th>
+                    <th class="px-3 py-2 border-b">Capital Social</th>
+                    <th class="px-3 py-2 border-b">Tipo Unidade</th>
+                    <th class="px-3 py-2 border-b">Situação</th>
+                    <th class="px-3 py-2 border-b">Telefone</th>
+                    <th class="px-3 py-2 border-b">E-mail</th>
                 </tr>
             </thead>
-            <tbody id="resultado-body" class="text-sm text-gray-600">
+
+            <tbody id="resultado-body" class="divide-y divide-gray-100">
                 <!-- Preenchido via JS -->
                 <tr class="invisible">
                     <td class="px-4 py-2 border-b">000.000.000/0000-00</td>
