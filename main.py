@@ -46,6 +46,7 @@ def filtrar(
     municipio = municipio.zfill(4)
 
     cnae = sub(r"[-/]", "", cnae)
+    
     skip = (page - 1) * 100
 
 
