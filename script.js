@@ -209,13 +209,14 @@ async function consultar() {
 
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
-                    <td class="px-3 py-2 text-left border-b whitespace-nowrap font-mono tracking-tight">${cnpj}</td>
-                    <td class="px-4 py-2 text-left border-b break-words">${nome}</td>
-                    <td class="px-4 py-2 text-left border-b whitespace-nowrap">${capital}</td>
-                    <td class="px-4 py-2 text-left border-b whitespace-nowrap">${tipo}</td>
-                    <td class="px-4 py-2 border-b">${situacao}</td>
-                    <td class="px-4 py-2 border-b whitespace-nowrap">${telefone}</td>
-                    <td class="pl-0 pr-4 py-2 text-left text-sm font-semibold text-gray-600 border-b">${email}</td>
+                    <td class="px-3 py-2 whitespace-nowrap border-b">${cnpj}</td>
+                    <td class="px-3 py-2 break-words border-b">${nome}</td>
+                    <td class="px-3 py-2 whitespace-nowrap border-b">${capital}</td>
+                    <td class="px-3 py-2 whitespace-nowrap border-b">${tipo}</td>
+                    <td class="px-3 py-2 border-b">${situacao}</td>
+                    <td class="px-3 py-2 whitespace-nowrap border-b">${telefone}</td>
+                    <td class="px-3 py-2 break-all text-sm text-gray-600 border-b">${email}</td>
+
 `;
                 tbody.appendChild(tr);
             });
