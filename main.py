@@ -34,22 +34,27 @@ def formatar_cnpj(basico, ordem, dv):
     cnpj = f"{basico.zfill(8)}{ordem.zfill(4)}{dv.zfill(2)}"
     return f"{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/{cnpj[8:12]}-{cnpj[12:14]}"
 
-# Filtro principal
 @app.get("/filtro")
 def filtrar(
     uf: str,
     municipio: str,
     cnae: str,
     situacao: Optional[str] = None,
+    faixa_capital: Optional[str] = None,
     page: int = Query(1, ge=1)
 ):
     municipio = municipio.zfill(4)
-
     cnae = sub(r"[-/]", "", cnae)
-    
     skip = (page - 1) * 100
 
-
+    faixas_capital = {
+        "<=100K": {"$lte": 100_000},
+        "100K-<=1M": {"$gt": 100_000, "$lte": 1_000_000},
+        "1M-<=10M": {"$gt": 1_000_000, "$lte": 10_000_000},
+        "10M-<=50M": {"$gt": 10_000_000, "$lte": 50_000_000},
+        "50M-<=100M": {"$gt": 50_000_000, "$lte": 100_000_000},
+        ">100M": {"$gt": 100_000_000},
+    }
 
     match_query = {
         "uf": uf.upper(),
@@ -75,7 +80,37 @@ def filtrar(
             "path": "$empresa_info",
             "preserveNullAndEmptyArrays": True
         }},
-        {"$project": {
+    ]
+
+    # Se filtro faixa_capital fornecido, converte capital_social para float e filtra
+    if faixa_capital in faixas_capital:
+        pipeline.append({
+            "$addFields": {
+                "capital_float": {
+                    "$toDouble": {
+                        "$replaceAll": {
+                            "input": {
+                                "$replaceAll": {
+                                    "input": {"$ifNull": ["$empresa_info.capital_social", "0,00"]},
+                                    "find": ".",
+                                    "replacement": ""
+                                }
+                            },
+                            "find": ",",
+                            "replacement": "."
+                        }
+                    }
+                }
+            }
+        })
+        pipeline.append({
+            "$match": {
+                "capital_float": faixas_capital[faixa_capital]
+            }
+        })
+
+    pipeline.append({
+        "$project": {
             "_id": 0,
             "cnpj_basico": 1,
             "cnpj_ordem": 1,
@@ -86,9 +121,9 @@ def filtrar(
             "telefone1": {"$ifNull": ["$telefone1", ""]},
             "email": {"$ifNull": ["$email", "—"]},
             "razao_social": {"$ifNull": ["$empresa_info.razao_social", "Desconhecida"]},
-            "capital_social": {"$ifNull": ["$empresa_info.capital_social", 0]}
-        }}
-    ]
+            "capital_social": {"$ifNull": ["$empresa_info.capital_social", "0,00"]},
+        }
+    })
 
     resultados = list(colecao_cnpjs.aggregate(pipeline))
     total = colecao_cnpjs.count_documents(match_query)
@@ -97,11 +132,11 @@ def filtrar(
     for r in resultados:
         cnpj = formatar_cnpj(r["cnpj_basico"], r["cnpj_ordem"], r["cnpj_dv"])
         nome = r.get("razao_social", "Desconhecida")
-        capital = r.get("capital_social", 0)
+        capital = r.get("capital_social", "0,00")
 
         try:
             if isinstance(capital, str):
-                capital = capital.replace("R$", "").replace(".", "").replace(",", ".").strip()
+                capital = capital.replace(".", "").replace(",", ".").strip()
             capital = float(capital)
         except (ValueError, TypeError, AttributeError):
             capital = 0.0
@@ -137,6 +172,7 @@ def filtrar(
         "resultados": dados,
         "ultima_pagina": (total + 99) // 100
     }
+
 
 # Lista UFs
 @app.get("/ufs")
