@@ -141,7 +141,7 @@ async function carregarSubclassesPorClasse() {
             cnaes.map(c => `<option value="${c.cnae_fiscal_principal}">${c.cnae_rotulo}</option>`).join('');
         select.disabled = false;
     } catch (err) {
-        console.error("Erro ao carregar CNAEs:", err, await res.text());
+        console.error("Erro ao carregar CNAEs:", err);
     }
 }
 
@@ -165,6 +165,7 @@ async function consultar() {
     const municipio = document.getElementById("municipio").value.trim();
     const cnae = document.getElementById("cnaeSelect").value.trim();
     const situacao = document.getElementById("situacao").value;
+    const faixaCapital = document.getElementById("faixaCapital").value;
     const loading = document.getElementById("loading");
     const tbody = document.getElementById("resultado-body");
     const paginacaoContainer = document.getElementById("paginacao-container");
@@ -174,15 +175,15 @@ async function consultar() {
         return;
     }
 
-    const url = `${BASE_URL}/filtro?uf=${uf}&municipio=${municipio}&cnae=${cnae}&situacao=${situacao}&page=${paginaAtual}`;
+    const url = `${BASE_URL}/filtro?uf=${uf}&municipio=${municipio}&cnae=${cnae}&situacao=${situacao}&faixa_capital=${faixaCapital}&page=${paginaAtual}`;
     loading.classList.remove("hidden");
     tbody.innerHTML = "";
 
     try {
         const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
         const data = await res.json();
+
         ultimaPagina = data.ultima_pagina || 1;
         document.getElementById("paginacao").textContent = `Página ${paginaAtual} de ${ultimaPagina}`;
 
@@ -202,6 +203,7 @@ async function consultar() {
                 const email = resultado.email || '—';
                 const situacao = resultado.situacao_cadastral || '—';
 
+                // Quebra o nome da empresa depois da 50ª posição
                 const pos = nome.indexOf(' ', 50);
                 if (pos !== -1) {
                     nome = nome.slice(0, pos) + '<br>' + nome.slice(pos + 1);
@@ -215,9 +217,7 @@ async function consultar() {
                     <td class="px-3 py-2 whitespace-nowrap border-b">${tipo}</td>
                     <td class="px-3 py-2 border-b">${situacao}</td>
                     <td class="px-3 py-2 whitespace-nowrap border-b">${telefone}</td>
-                    <td class="px-3 py-2 break-all text-sm text-gray-600 border-b">${email}</td>
-
-`;
+                    <td class="px-3 py-2 break-all text-sm text-gray-600 border-b">${email}</td>`;
                 tbody.appendChild(tr);
             });
 
