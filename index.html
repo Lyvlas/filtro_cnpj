@@ -9,10 +9,8 @@
 <body class="bg-gray-50 font-sans p-6">
     <h1 class="text-4xl font-semibold tracking-wide text-center mb-8 text-gray-800">P-LEAD</h1>
 
-<!-- max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg -->
-
-
     <div class="mt-8 mx-auto bg-white p-6 rounded-lg shadow-lg" style="max-width: 70rem;">
+        <!-- UF -->
         <div class="mb-4">
             <label for="uf" class="block text-gray-700 font-medium">UF:</label>
             <select id="uf" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -20,6 +18,7 @@
             </select>
         </div>
 
+        <!-- Município -->
         <div class="mb-4">
             <label for="municipio" class="block text-gray-700 font-medium">Município:</label>
             <select id="municipio" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -27,7 +26,7 @@
             </select>
         </div>
 
-        <!-- Seção CNAE -->
+        <!-- Filtros CNAE -->
         <div class="mb-4">
             <label for="secaoSelect" class="block text-gray-700 font-medium">Seção CNAE:</label>
             <select id="secaoSelect" onchange="carregarDivisoesPorSecao()" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -57,14 +56,13 @@
         </div>
 
         <div class="mb-4">
-            <label for="cnaeSelect" class="block text-gray-700 font-medium">Codigo CNAE:</label>
+            <label for="cnaeSelect" class="block text-gray-700 font-medium">Código CNAE:</label>
             <select id="cnaeSelect" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" disabled>
                 <option value="">Selecione um CNAE</option>
             </select>
         </div>
 
-
-
+        <!-- Situação Cadastral -->
         <div class="mb-4">
             <label for="situacao" class="block text-gray-700 font-medium">Situação Cadastral:</label>
             <select id="situacao" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -77,6 +75,21 @@
             </select>
         </div>
 
+        <div class="mb-4">
+            <label for="faixaCapital" class="block text-gray-700 font-medium">Faixa de Capital Social:</label>
+            <select id="faixaCapital" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Todas</option>
+                <option value="<=100K">Até R$ 100 mil</option>
+                <option value="100K-<=1M">De R$ 100 mil até R$ 1 milhão</option>
+                <option value="1M-<=10M">De R$ 1 milhão até R$ 10 milhões</option>
+                <option value="10M-<=50M">De R$ 10 milhões até R$ 50 milhões</option>
+                <option value="50M-<=100M">De R$ 50 milhões até R$ 100 milhões</option>
+                <option value=">100M">Acima de R$ 100 milhões</option>
+            </select>
+        </div>
+
+
+        <!-- Botão de busca -->
         <div class="text-center">
             <button onclick="paginaAtual = 1; consultar()" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
                 Buscar
@@ -84,12 +97,14 @@
         </div>
     </div>
 
+    <!-- Loader -->
     <div id="loading" class="flex justify-center mt-6 hidden">
         <div class="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
     </div>
 
+    <!-- Tabela de resultados -->
     <div class="mt-8 mx-auto bg-white p-6 rounded-xl shadow-xl border border-gray-200 overflow-auto" style="max-width: 70rem;">
-       <table id="resultado" class="w-full table-auto border-collapse text-sm text-gray-700">
+        <table id="resultado" class="w-full table-auto border-collapse text-sm text-gray-700">
             <thead class="bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 <tr>
                     <th class="px-3 py-2 border-b">CNPJ</th>
@@ -101,27 +116,14 @@
                     <th class="px-3 py-2 border-b">E-mail</th>
                 </tr>
             </thead>
-
             <tbody id="resultado-body" class="divide-y divide-gray-100">
                 <!-- Preenchido via JS -->
-                <tr class="invisible">
-                    <td class="px-4 py-2 border-b">000.000.000/0000-00</td>
-                    <td class="px-4 py-2 border-b">EMPRESA EXEMPLO</td>
-                    <td class="px-4 py-2 border-b">EX 20000,00</td>
-                    <td class="px-4 py-2 border-b">EX MATRIX</td>
-                    <td class="px-4 py-2 border-b">EX 01</td>
-                    <td class="px-4 py-2 border-b">EX (00) 0000-0000</td>
-                    <td class="px-4 py-2 border-b">EX exemplo@gmail.com</td>
-                </tr>
             </tbody>
         </table>
 
-         <!-- Paginador -->
+        <!-- Paginação -->
         <div id="paginacao-container" class="flex justify-center gap-4 mt-4 hidden">
-            <!-- Botão Anterior -->
-            <button id="anterior"
-                onclick="mudarPagina(-1)"
-                class="w-10 h-10 bg-gray-300 rounded-full hover:bg-gray-400 disabled:opacity-30 flex items-center justify-center transition">
+            <button id="anterior" onclick="mudarPagina(-1)" aria-label="Página anterior" class="w-10 h-10 bg-gray-300 rounded-full hover:bg-gray-400 disabled:opacity-30 flex items-center justify-center transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
@@ -129,16 +131,12 @@
 
             <span id="paginacao" class="text-gray-600 self-center text-sm">Página 1 de 1</span>
 
-            <!-- Botão Próximo -->
-            <button id="proximo"
-                onclick="mudarPagina(1)"
-                class="w-10 h-10 bg-gray-300 rounded-full hover:bg-gray-400 disabled:opacity-30 flex items-center justify-center transition">
+            <button id="proximo" onclick="mudarPagina(1)" aria-label="Próxima página" class="w-10 h-10 bg-gray-300 rounded-full hover:bg-gray-400 disabled:opacity-30 flex items-center justify-center transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
             </button>
-
-        </div>    
+        </div>
     </div>
 
     <script src="/static/script.js"></script>
