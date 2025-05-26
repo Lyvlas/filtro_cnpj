@@ -166,21 +166,26 @@ async function consultar() {
     const cnae = document.getElementById("cnaeSelect").value.trim();
     const situacao = document.getElementById("situacao").value;
     const faixaCapital = document.getElementById("faixaCapital").value;
+    const tipoUnidade = document.getElementById("tipoUnidade").value;
     const loading = document.getElementById("loading");
     const tbody = document.getElementById("resultado-body");
     const paginacaoContainer = document.getElementById("paginacao-container");
 
-    if (!uf || !municipio || !cnae) {
-        alert("Preencha todos os campos obrigatórios.");
-        return;
-    }
+    const queryParams = new URLSearchParams({
+        uf,
+        municipio,
+        cnae,
+        situacao,
+        faixa_capital: faixaCapital,
+        tipo_unidade: tipoUnidade,
+        page: paginaAtual
+    });
 
-    const url = `${BASE_URL}/filtro?uf=${uf}&municipio=${municipio}&cnae=${cnae}&situacao=${situacao}&faixa_capital=${faixaCapital}&page=${paginaAtual}`;
     loading.classList.remove("hidden");
     tbody.innerHTML = "";
 
     try {
-        const res = await fetch(url);
+        const res = await fetch(`${BASE_URL}/filtro?${queryParams.toString()}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
 
@@ -190,7 +195,7 @@ async function consultar() {
         if (!data.resultados || data.resultados.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="px-4 py-2 text-center text-gray-500">Nenhum resultado encontrado</td>
+                    <td colspan="9" class="px-4 py-2 text-center text-gray-500">Nenhum resultado encontrado</td>
                 </tr>`;
             paginacaoContainer.classList.add("hidden");
         } else {
@@ -202,8 +207,9 @@ async function consultar() {
                 const telefone = resultado.telefone || '—';
                 const email = resultado.email || '—';
                 const situacao = resultado.situacao_cadastral || '—';
+                const classeDescricao = resultado.classe_cnae || '—';
+                const cnaeDescricao = resultado.cnae_principal_descricao || '—';
 
-                // Quebra o nome da empresa depois da 50ª posição
                 const pos = nome.indexOf(' ', 50);
                 if (pos !== -1) {
                     nome = nome.slice(0, pos) + '<br>' + nome.slice(pos + 1);
@@ -214,6 +220,8 @@ async function consultar() {
                     <td class="px-3 py-2 whitespace-nowrap border-b">${cnpj}</td>
                     <td class="px-3 py-2 break-words border-b">${nome}</td>
                     <td class="px-3 py-2 whitespace-nowrap border-b">${capital}</td>
+                    <td class="px-3 py-2 break-words border-b">${classeDescricao}</td>
+                    <td class="px-3 py-2 break-words border-b">${cnaeDescricao}</td>
                     <td class="px-3 py-2 whitespace-nowrap border-b">${tipo}</td>
                     <td class="px-3 py-2 border-b">${situacao}</td>
                     <td class="px-3 py-2 whitespace-nowrap border-b">${telefone}</td>
