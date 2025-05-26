@@ -10,21 +10,23 @@
     <h1 class="text-4xl font-semibold tracking-wide text-center mb-8 text-gray-800">P-LEAD</h1>
 
     <div class="mt-8 mx-auto bg-white p-6 rounded-lg shadow-lg" style="max-width: 70rem;">
-        <!-- UF -->
-        <div class="mb-4">
-            <label for="uf" class="block text-gray-700 font-medium">UF:</label>
-            <select id="uf" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <!-- Carregado via JS -->
-            </select>
+        <!-- UF e Município lado a lado -->
+        <div class="mb-4 flex gap-4">
+            <div class="w-1/2">
+                <label for="uf" class="block text-gray-700 font-medium">UF:</label>
+                <select id="uf" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <!-- Carregado via JS -->
+                </select>
+            </div>
+
+            <div class="w-1/2">
+                <label for="municipio" class="block text-gray-700 font-medium">Município:</label>
+                <select id="municipio" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <!-- Carregado via JS -->
+                </select>
+            </div>
         </div>
 
-        <!-- Município -->
-        <div class="mb-4">
-            <label for="municipio" class="block text-gray-700 font-medium">Município:</label>
-            <select id="municipio" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <!-- Carregado via JS -->
-            </select>
-        </div>
 
         <!-- Filtros CNAE -->
         <div class="mb-4">
@@ -62,32 +64,42 @@
             </select>
         </div>
 
-        <!-- Situação Cadastral -->
-        <div class="mb-4">
-            <label for="situacao" class="block text-gray-700 font-medium">Situação Cadastral:</label>
-            <select id="situacao" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <option value="">Todas</option>
-                <option value="01">NULA</option>
-                <option value="02">ATIVA</option>
-                <option value="03">SUSPENSA</option>
-                <option value="04">INAPTA</option>
-                <option value="08">BAIXADA</option>
-            </select>
-        </div>
+        <!-- Situação Cadastral e Faixa de Capital Social lado a lado -->
+        <div class="mb-4 flex gap-4">
+            <div class="w-1/3">
+                <label for="situacao" class="block text-gray-700 font-medium">Situação Cadastral:</label>
+                <select id="situacao" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="02">ATIVA</option>
+                    <option value="">Todas</option>
+                    <option value="01">NULA</option>    
+                    <option value="03">SUSPENSA</option>
+                    <option value="04">INAPTA</option>
+                    <option value="08">BAIXADA</option>
+                </select>
+            </div>
 
-        <div class="mb-4">
-            <label for="faixaCapital" class="block text-gray-700 font-medium">Faixa de Capital Social:</label>
-            <select id="faixaCapital" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <option value="">Todas</option>
-                <option value="<=100K">Até R$ 100 mil</option>
-                <option value="100K-<=1M">De R$ 100 mil até R$ 1 milhão</option>
-                <option value="1M-<=10M">De R$ 1 milhão até R$ 10 milhões</option>
-                <option value="10M-<=50M">De R$ 10 milhões até R$ 50 milhões</option>
-                <option value="50M-<=100M">De R$ 50 milhões até R$ 100 milhões</option>
-                <option value=">100M">Acima de R$ 100 milhões</option>
-            </select>
+            <div class="w-1/3">
+                <label for="faixaCapital" class="block text-gray-700 font-medium">Faixa de Capital Social:</label>
+                <select id="faixaCapital" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Todas</option>
+                    <option value="<=100K">Até R$ 100 mil</option>
+                    <option value="100K-<=1M">De R$ 100 mil até R$ 1 milhão</option>
+                    <option value="1M-<=10M">De R$ 1 milhão até R$ 10 milhões</option>
+                    <option value="10M-<=50M">De R$ 10 milhões até R$ 50 milhões</option>
+                    <option value="50M-<=100M">De R$ 50 milhões até R$ 100 milhões</option>
+                    <option value=">100M">Acima de R$ 100 milhões</option>
+                </select>
+            </div>
+            <div class="w-1/3">
+                <label for="tipoUnidade" class="block text-gray-700 font-medium">Tipo de Unidade:</label>
+                <select id="tipoUnidade" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="1">Matriz</option>
+                    <option value="">Todas</option>
+                    <option value="2">Filial</option>
+                </select>
+            </div>
+        
         </div>
-
 
         <!-- Botão de busca -->
         <div class="text-center">
@@ -110,6 +122,8 @@
                     <th class="px-3 py-2 border-b">CNPJ</th>
                     <th class="px-3 py-2 border-b">Empresa</th>
                     <th class="px-3 py-2 border-b">Capital Social</th>
+                    <th class="px-3 py-2 border-b">Classe</th>
+                    <th class="px-3 py-2 border-b">CNAE</th>
                     <th class="px-3 py-2 border-b">Tipo Unidade</th>
                     <th class="px-3 py-2 border-b">Situação</th>
                     <th class="px-3 py-2 border-b">Telefone</th>
