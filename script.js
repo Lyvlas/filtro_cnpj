@@ -160,32 +160,62 @@ function mudarPagina(direcao) {
     consultar();
 }
 
+function exportarParaCSV() {
+    const linhas = [["CNPJ", "Empresa", "Capital Social", "Classe", "CNAE", "Tipo Unidade", "Situação", "Telefone", "E-mail"]];
+    const tbody = document.getElementById("resultado-body");
+
+    for (const row of tbody.querySelectorAll("tr")) {
+        const colunas = Array.from(row.querySelectorAll("td")).map(td => {
+            return '"' + td.innerText.replace(/"/g, '""') + '"'; // Escapa aspas
+        });
+        linhas.push(colunas);
+    }
+
+    const csvContent = linhas.map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", "consulta_empresas.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 async function consultar() {
     const uf = document.getElementById("uf").value.trim();
     const municipio = document.getElementById("municipio").value.trim();
-    const cnae = document.getElementById("cnaeSelect").value.trim();
+    const secao = document.getElementById("secaoSelect").value.trim();
+    const divisao = document.getElementById("divisaoSelect").value.trim();
+    const grupo = document.getElementById("grupoSelect").value.trim();
+    const classe = document.getElementById("classeSelect").value.trim();
+    const subclasse = document.getElementById("cnaeSelect").value.trim();
     const situacao = document.getElementById("situacao").value;
     const faixaCapital = document.getElementById("faixaCapital").value;
     const tipoUnidade = document.getElementById("tipoUnidade").value;
+
+    const params = [];
+    if (uf) params.push(`uf=${encodeURIComponent(uf)}`);
+    if (municipio) params.push(`municipio=${encodeURIComponent(municipio)}`);
+    if (secao) params.push(`secao=${encodeURIComponent(secao)}`);
+    if (divisao) params.push(`divisao=${encodeURIComponent(divisao)}`);
+    if (grupo) params.push(`grupo=${encodeURIComponent(grupo)}`);
+    if (classe) params.push(`classe=${encodeURIComponent(classe)}`);
+    if (subclasse) params.push(`subclasse=${encodeURIComponent(subclasse)}`);
+    if (situacao) params.push(`situacao=${encodeURIComponent(situacao)}`);
+    if (faixaCapital) params.push(`faixa_capital=${encodeURIComponent(faixaCapital)}`);
+    if (tipoUnidade) params.push(`tipo_unidade=${encodeURIComponent(tipoUnidade)}`);
+    params.push(`page=${paginaAtual}`);
+
     const loading = document.getElementById("loading");
     const tbody = document.getElementById("resultado-body");
     const paginacaoContainer = document.getElementById("paginacao-container");
-
-    const queryParams = new URLSearchParams({
-        uf,
-        municipio,
-        cnae,
-        situacao,
-        faixa_capital: faixaCapital,
-        tipo_unidade: tipoUnidade,
-        page: paginaAtual
-    });
 
     loading.classList.remove("hidden");
     tbody.innerHTML = "";
 
     try {
-        const res = await fetch(`${BASE_URL}/filtro?${queryParams.toString()}`);
+        const res = await fetch(`${BASE_URL}/filtro?${params.join("&")}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
 
