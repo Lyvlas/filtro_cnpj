@@ -37,38 +37,49 @@ def formatar_cnpj(basico, ordem, dv):
 @app.get("/filtro")
 def filtrar(
     uf: str,
-    municipio: str,
-    cnae: str,
-    situacao: Optional[str] = None,
-    faixa_capital: Optional[str] = None,
-    tipo_unidade: Optional[str] = None,
+    municipio: Optional[str] = "",
+    secao: Optional[str] = "",
+    divisao: Optional[str] = "",
+    grupo: Optional[str] = "",
+    classe: Optional[str] = "",
+    subclasse: Optional[str] = "",
+    cnae: Optional[str] = "",
+    situacao: Optional[str] = "",
+    faixa_capital: Optional[str] = "",
+    tipo_unidade: Optional[str] = "",
     page: int = Query(1, ge=1)
 ):
-    municipio = municipio.zfill(4)
-    cnae = sub(r"[-/]", "", cnae)
     skip = (page - 1) * 100
 
-    faixas_capital = {
-        "<=100K": {"$lte": 100_000},
-        "100K-<=1M": {"$gt": 100_000, "$lte": 1_000_000},
-        "1M-<=10M": {"$gt": 1_000_000, "$lte": 10_000_000},
-        "10M-<=50M": {"$gt": 10_000_000, "$lte": 50_000_000},
-        "50M-<=100M": {"$gt": 50_000_000, "$lte": 100_000_000},
-        ">100M": {"$gt": 100_000_000},
-    }
+    # Monta filtro CNAE
+    filtro_cnae = {}
+    if secao: filtro_cnae["secao_codigo"] = secao
+    if divisao: filtro_cnae["divisao_codigo"] = divisao
+    if grupo: filtro_cnae["grupo_codigo"] = grupo
+    if classe: filtro_cnae["classe_codigo"] = classe
+    if subclasse: filtro_cnae["subclasse_codigo"] = subclasse
 
-    match_query = {
-        "uf": uf.upper(),
-        "codigo_municipio": municipio,
-        "cnae_fiscal_principal": cnae
-    }
+    cnaes_filtrados = []
+    if cnae:
+        cnaes_filtrados = [sub(r"[-/]", "", cnae)]
+    elif filtro_cnae:
+        cnaes_docs = colecao_grupo_cnae.find(filtro_cnae, {"subclasse_codigo": 1})
+        cnaes_filtrados = list({
+            sub(r"[-/]", "", doc["subclasse_codigo"])
+            for doc in cnaes_docs if "subclasse_codigo" in doc
+        })
 
-    if situacao:
-        match_query["situacao_cadastral"] = situacao
-
+    # Monta filtro principal
+    match_query = {}
+    if uf: match_query["uf"] = uf.upper()
+    if municipio: match_query["codigo_municipio"] = municipio.zfill(4)
+    if situacao: match_query["situacao_cadastral"] = situacao
     if tipo_unidade in {"1", "2"}:
         match_query["matriz_filial"] = tipo_unidade  # "1" para Matriz, "2" para Filial
+    if cnaes_filtrados:
+        match_query["cnae_fiscal_principal"] = {"$in": cnaes_filtrados}
 
+    # Pipeline
     pipeline = [
         {"$match": match_query},
         {"$sort": {"cnpj_basico": 1}},
@@ -84,9 +95,28 @@ def filtrar(
             "path": "$empresa_info",
             "preserveNullAndEmptyArrays": True
         }},
+        # Adicione este lookup para pegar as descrições do CNAE
+        {"$lookup": {
+            "from": "grupo_cnae",
+            "localField": "cnae_fiscal_principal",
+            "foreignField": "subclasse_codigo",
+            "as": "cnae_info"
+        }},
+        {"$unwind": {
+            "path": "$cnae_info",
+            "preserveNullAndEmptyArrays": True
+        }},
     ]
 
-    # Se filtro faixa_capital fornecido, converte capital_social para float e filtra
+    # Filtro faixa capital
+    faixas_capital = {
+        "<=100K": {"$lte": 100_000},
+        "100K-<=1M": {"$gt": 100_000, "$lte": 1_000_000},
+        "1M-<=10M": {"$gt": 1_000_000, "$lte": 10_000_000},
+        "10M-<=50M": {"$gt": 10_000_000, "$lte": 50_000_000},
+        "50M-<=100M": {"$gt": 50_000_000, "$lte": 100_000_000},
+        ">100M": {"$gt": 100_000_000},
+    }
     if faixa_capital in faixas_capital:
         pipeline.append({
             "$addFields": {
@@ -126,6 +156,8 @@ def filtrar(
             "email": {"$ifNull": ["$email", "—"]},
             "razao_social": {"$ifNull": ["$empresa_info.razao_social", "Desconhecida"]},
             "capital_social": {"$ifNull": ["$empresa_info.capital_social", "0,00"]},
+            "classe_cnae": {"$ifNull": ["$cnae_info.classe_descricao", "—"]},  # <- descrição da classe
+            "cnae_principal_descricao": {"$ifNull": ["$cnae_info.subclasse_descricao", "—"]}
         }
     })
 
@@ -166,6 +198,8 @@ def filtrar(
             "cnpj_completo": cnpj,
             "nome_empresa": nome,
             "capital_social": capital_formatado,
+            "classe_cnae": r.get("classe_cnae", "—"),
+            "cnae_principal_descricao": r.get("cnae_principal_descricao", "—"),
             "tipo_unidade": tipo,
             "situacao_cadastral": situacao_desc,
             "telefone": telefone,
