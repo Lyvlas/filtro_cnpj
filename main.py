@@ -41,6 +41,7 @@ def filtrar(
     cnae: str,
     situacao: Optional[str] = None,
     faixa_capital: Optional[str] = None,
+    tipo_unidade: Optional[str] = None,
     page: int = Query(1, ge=1)
 ):
     municipio = municipio.zfill(4)
@@ -64,6 +65,9 @@ def filtrar(
 
     if situacao:
         match_query["situacao_cadastral"] = situacao
+
+    if tipo_unidade in {"1", "2"}:
+        match_query["matriz_filial"] = tipo_unidade  # "1" para Matriz, "2" para Filial
 
     pipeline = [
         {"$match": match_query},
