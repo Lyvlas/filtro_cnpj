@@ -43,26 +43,30 @@
             </select>
         </div>
 
-        <div class="mb-4">
-            <label for="grupoSelect" class="block text-gray-700 font-medium">Grupo CNAE:</label>
-            <select id="grupoSelect" onchange="carregarClassesPorGrupo()" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" disabled>
-                <option value="">Selecione um Grupo</option>
-            </select>
+        <!-- Filtros CNAE lado a lado (Grupo, Classe, Código) -->
+        <div class="mb-4 flex flex-col sm:flex-row gap-4">
+            <div class="w-full sm:w-1/3">
+                <label for="grupoSelect" class="block text-gray-700 font-medium">Grupo CNAE:</label>
+                <select id="grupoSelect" onchange="carregarClassesPorGrupo()" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" disabled>
+                    <option value="">Selecione um Grupo</option>
+                </select>
+            </div>
+
+            <div class="w-full sm:w-1/3">
+                <label for="classeSelect" class="block text-gray-700 font-medium">Classe CNAE:</label>
+                <select id="classeSelect" onchange="carregarSubclassesPorClasse()" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" disabled>
+                    <option value="">Selecione uma Classe</option>
+                </select>
+            </div>
+
+            <div class="w-full sm:w-1/3">
+                <label for="cnaeSelect" class="block text-gray-700 font-medium">Código CNAE:</label>
+                <select id="cnaeSelect" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" disabled>
+                    <option value="">Selecione um CNAE</option>
+                </select>
+            </div>
         </div>
 
-        <div class="mb-4">
-            <label for="classeSelect" class="block text-gray-700 font-medium">Classe CNAE:</label>
-            <select id="classeSelect" onchange="carregarSubclassesPorClasse()" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" disabled>
-                <option value="">Selecione uma Classe</option>
-            </select>
-        </div>
-
-        <div class="mb-4">
-            <label for="cnaeSelect" class="block text-gray-700 font-medium">Código CNAE:</label>
-            <select id="cnaeSelect" class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" disabled>
-                <option value="">Selecione um CNAE</option>
-            </select>
-        </div>
 
         <!-- Situação Cadastral e Faixa de Capital Social lado a lado -->
         <div class="mb-4 flex gap-4">
