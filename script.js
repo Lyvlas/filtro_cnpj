@@ -252,10 +252,10 @@ async function consultar() {
                     <td class="px-3 py-2 whitespace-nowrap border-b">${capital}</td>
                     <td class="px-3 py-2 break-words border-b">${classeDescricao}</td>
                     <td class="px-3 py-2 break-words border-b">${cnaeDescricao}</td>
-                    <td class="px-3 py-2 whitespace-nowrap border-b">${tipo}</td>
-                    <td class="px-3 py-2 border-b">${situacao}</td>
-                    <td class="px-3 py-2 whitespace-nowrap border-b">${telefone}</td>
-                    <td class="px-3 py-2 break-all text-sm text-gray-600 border-b">${email}</td>`;
+                    <td class="px-3 py-2 whitespace-nowrap border-b hidden">${tipo}</td>
+                    <td class="px-3 py-2 border-b hidden">${situacao}</td>
+                    <td class="px-3 py-2 whitespace-nowrap border-b hidden">${telefone}</td>
+                    <td class="px-3 py-2 break-all text-sm text-gray-600 border-b hidden">${email}</td>`;
                 tbody.appendChild(tr);
             });
 
