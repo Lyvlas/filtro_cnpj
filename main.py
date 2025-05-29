@@ -315,3 +315,4 @@ def raiz():
 
 # Arquivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/template", StaticFiles(directory="template"), name="template")
