@@ -5,6 +5,11 @@ from fastapi.staticfiles import StaticFiles
 from pymongo import MongoClient
 from typing import Optional
 from re import sub
+from fastapi import Body
+from fastapi import Request
+from pydantic import BaseModel
+from datetime import datetime
+from fastapi.encoders import jsonable_encoder
 
 app = FastAPI()
 
@@ -24,6 +29,7 @@ colecao_municipios = db["municipio"]
 colecao_cnaes = db["cnaes"]
 colecao_grupo_cnae = db["grupo_cnae"]
 colecao_empresas = db["empresa"]
+colecao_leads = db["lead"]
 
 # Índices
 colecao_cnpjs.create_index([("uf", 1), ("codigo_municipio", 1), ("cnae_fiscal_principal", 1)])
@@ -306,6 +312,30 @@ def listar_cnaes(classe_codigo: str):
                 "cnae_rotulo": f"{subclasse} - {doc.get('subclasse_descricao', '')}"
             })
     return sorted(resultados, key=lambda x: x["cnae_fiscal_principal"])
+
+class LeadInput(BaseModel):
+    nome: str
+    dados: list[dict]
+
+@app.post("/salvar-lead")
+async def salvar_lead(request: Request, body: LeadInput):
+    if not body.dados:
+        return {"erro": "Nenhum dado para salvar"}
+
+    doc = {
+        "nome": body.nome,
+        "criado_em": datetime.utcnow(),
+        "dados": body.dados[:100]  # Limita a 100
+    }
+    colecao_leads.insert_one(doc)
+    return {"mensagem": "Lead salvo com sucesso!"}
+
+
+
+@app.get("/leads")
+def listar_leads():
+    leads = colecao_leads.find({}, {"_id": 0, "nome": 1, "dados": 1, "criado_em": 1}).sort("criado_em", -1)
+    return jsonable_encoder(list(leads))  # ✅ Garante que datas e listas estejam no formato JSON
 
 
 # Página inicial
