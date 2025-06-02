@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultas Salvas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/style.css">
+    
+</head>
+<body class="bg-gray-50 font-sans">
+    
+    <!-- Sidebar -->
+    <aside class="group fixed left-0 top-0 z-10 h-screen bg-white shadow-md transition-all duration-300 ease-in-out w-16 hover:w-[10.75rem] overflow-hidden p-6">
+    <div class="flex flex-col items-start">
+        <!-- Título -->
+        <h2 class="text-2xl font-bold text-blue-600 mb-8 flex items-center">
+        <span>P</span>
+        <span class="ml-1 hidden group-hover:inline transition-all duration-300">-LEAD</span>
+        </h2>
+
+        <!-- Navegação com ul/li -->
+        <ul class="flex flex-col gap-4 w-full">
+        <li>
+            <a href="/template/index.html" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 transition">
+            <span class="text-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                </svg>
+            </span>
+            <span class="hidden group-hover:inline text-base font-medium">Filtro</span>
+            </a>
+        </li>
+        <li>
+            <a href="/template/lead.html" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 transition">
+            <span class="text-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" />
+                </svg>
+            </span>
+            <span class="hidden group-hover:inline text-base font-medium">Leads</span>
+            </a>
+        </li>
+        </ul>
+    </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 p-8">
+        <h1 class="text-3xl font-bold text-blue-600 mb-6"> 📋 Consultas Salvas</h1>
+        
+        <div class="bg-white shadow-md rounded-lg p-6 overflow-x-auto">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Leads Salvas</h2>
+            <table class="min-w-full bg-white">
+                <thead>
+                    <tr class="border-b">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CNPJ</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empresa</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capital Social</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Classe CNAE</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CNAE</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">E-mail</th>
+                    </tr>
+                </thead>
+                <tbody id="resultado-body" class="divide-y divide-gray-100">
+                    
+                </tbody>
+            </table>   
+
+        <script src="/static/lead.js"></script>
+</body>
+</html>
