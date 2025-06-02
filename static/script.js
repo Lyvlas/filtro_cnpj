@@ -14,9 +14,73 @@ window.onload = () => {
 
     document.getElementById("consultarBtn").addEventListener("click", () => {
         paginaAtual = 1;
-        consultar();
+        consultar(true);
     });
-};
+};  
+
+
+function abrirModalSalvarLead() {
+    const modal = document.getElementById("modalSalvarLead");
+    modal.classList.remove("hidden");
+}
+
+function fecharModalSalvarLead() {
+    const modal = document.getElementById("modalSalvarLead");
+    modal.classList.add("hidden");
+}
+
+async function salvarConsulta() {
+    const nomeLead = document.getElementById("nomeLead").value.trim();
+    if (!nomeLead) {
+        alert("Por favor, informe um nome para a lista.");
+        return;
+    }
+
+    const rows = document.querySelectorAll("#resultado-body tr");
+    if (rows.length === 0) {
+        alert("Nenhuma consulta foi realizada.");
+        return;
+    }
+
+    const dados = Array.from(rows).slice(0, 100).map(tr => {
+        const tds = tr.querySelectorAll("td");
+        return {
+            cnpj: tds[0]?.innerText || "—",
+            empresa: tds[1]?.innerText || "—",
+            capital_social: tds[2]?.innerText || "—",
+            classe_cnae: tds[3]?.innerText || "—",
+            cnae_descricao: tds[4]?.innerText || "—",
+            tipo_unidade: tds[5]?.innerText || "—",
+            situacao: tds[6]?.innerText || "—",
+            telefone: tds[7]?.innerText || "—",
+            email: tds[8]?.innerText || "—"
+        };
+    });
+
+    try {
+        const res = await fetch(`${window.location.origin}/salvar-lead`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                nome: nomeLead,
+                dados: dados
+            })
+        });
+
+        if (!res.ok) throw new Error("Erro ao salvar os dados.");
+        const json = await res.json();
+
+        alert(json.mensagem || "Consulta salva com sucesso!");
+        fecharModalSalvarLead();
+        document.getElementById("nomeLead").value = "";
+    } catch (err) {
+        alert("Erro ao salvar consulta: " + err.message);
+    }
+}
+
+
 
 // --------------------- UFs e Municípios ---------------------
 async function carregarUFs() {
@@ -228,6 +292,7 @@ async function consultar() {
                     <td colspan="9" class="px-4 py-2 text-center text-gray-500">Nenhum resultado encontrado</td>
                 </tr>`;
             paginacaoContainer.classList.add("hidden");
+            document.getElementById("btnSalvarConsulta").classList.add("hidden");
         } else {
             data.resultados.forEach(resultado => {
                 const cnpj = resultado.cnpj_completo || '—';
@@ -260,6 +325,7 @@ async function consultar() {
             });
 
             paginacaoContainer.classList.remove("hidden");
+            document.getElementById("btnSalvarConsulta").classList.remove("hidden");
         }
 
         document.getElementById("anterior").disabled = paginaAtual === 1;
