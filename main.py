@@ -5,7 +5,6 @@ from fastapi.staticfiles import StaticFiles
 from pymongo import MongoClient
 from typing import Optional
 from re import sub
-from fastapi import Body
 from fastapi import Request
 from pydantic import BaseModel
 from datetime import datetime
@@ -214,7 +213,9 @@ def filtrar(
 
     return {
         "resultados": dados,
-        "ultima_pagina": (total + 99) // 100
+        "total": total,
+        "ultima_pagina": (total + 99) // 100,
+        "pagina_atual": page
     }
 
 
